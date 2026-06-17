@@ -15,25 +15,25 @@ typedef struct rpc_peer rpc_peer_t;
 
 /* Handler for an incoming RPC request.
  *
- * peer        — the peer that sent the request. Use it to make reverse calls
+ * peer        -- the peer that sent the request. Use it to make reverse calls
  *               (server-to-client or client-to-server) from within the handler.
- * params      — raw request payload bytes (may be NULL if params_len == 0).
- * params_len  — length of the params buffer in bytes.
- * result      — out-param: handler allocates the response payload with
+ * params      -- raw request payload bytes (may be NULL if params_len == 0).
+ * params_len  -- length of the params buffer in bytes.
+ * result      -- out-param: handler allocates the response payload with
  *               malloc() and stores the pointer here. The framework will
  *               free() it after sending. Set to NULL for an empty response.
- * result_len  — out-param: length of the result buffer in bytes.
+ * result_len  -- out-param: length of the result buffer in bytes.
  */
 typedef void (*rpc_handler_t)(rpc_peer_t *peer, const void *params, int params_len,
                                void **result, int *result_len);
 
 /* Callback invoked when an async RPC call completes.
  *
- * status      — 0 on success, -1 if the remote returned an error response.
- * result      — response payload bytes. Only valid for the duration of the
+ * status      -- 0 on success, -1 if the remote returned an error response.
+ * result      -- response payload bytes. Only valid for the duration of the
  *               callback; copy if you need to retain it.
- * result_len  — length of the result buffer.
- * userdata    — the opaque pointer passed to rpc_call_async.
+ * result_len  -- length of the result buffer.
+ * userdata    -- the opaque pointer passed to rpc_call_async.
  */
 typedef void (*rpc_callback_t)(int status, const void *result, int result_len, void *userdata);
 
@@ -46,8 +46,8 @@ rpc_ctx_t *rpc_create(void);
 void rpc_destroy(rpc_ctx_t *ctx);
 
 /* Start listening for incoming WebSocket connections.
- * host  — IPv4 address string (e.g. "127.0.0.1") or "" / NULL for INADDR_ANY.
- * port  — TCP port to bind.
+ * host  -- IPv4 address string (e.g. "127.0.0.1") or "" / NULL for INADDR_ANY.
+ * port  -- TCP port to bind.
  * Returns 0 on success, -1 on error (errno set by underlying syscall). */
 int rpc_listen(rpc_ctx_t *ctx, const char *host, int port);
 
@@ -65,13 +65,13 @@ int rpc_register(rpc_ctx_t *ctx, const char *method, rpc_handler_t handler);
  * elapses, while continuing to drive the event loop (so other peers, reverse
  * calls, and async callbacks are still serviced).
  *
- * params/params_len — request payload to send (may be NULL/0).
- * result            — out-param: on success receives a malloc'd buffer with
+ * params/params_len -- request payload to send (may be NULL/0).
+ * result            -- out-param: on success receives a malloc'd buffer with
  *                     the response payload. Pass NULL if you don't want it
  *                     (the buffer is then freed internally). Caller must
  *                     free() the returned buffer.
- * result_len        — out-param: length of the response payload. May be NULL.
- * timeout_ms        — max time to wait, in milliseconds. <= 0 means wait
+ * result_len        -- out-param: length of the response payload. May be NULL.
+ * timeout_ms        -- max time to wait, in milliseconds. <= 0 means wait
  *                     forever.
  * Returns 0 on success, -1 on timeout or remote error. */
 int rpc_call(rpc_peer_t *peer, const char *method,

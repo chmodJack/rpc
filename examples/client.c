@@ -26,7 +26,7 @@ int main(void) {
     }
     printf("Connected to server\n");
 
-    /* Call hello — this will also trigger server to call ping back */
+    /* Call hello -- this will also trigger server to call ping back */
     void *result = NULL;
     int result_len = 0;
     int rc = rpc_call(peer, "hello", NULL, 0, &result, &result_len, 5000);

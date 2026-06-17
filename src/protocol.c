@@ -1,7 +1,7 @@
 #include "protocol.h"
+#include "compat.h"
 #include <stdlib.h>
 #include <string.h>
-#include <arpa/inet.h>
 
 int protocol_encode(const rpc_msg_t *msg, uint8_t **out) {
     int total = 4 + 4 + 1 + 2 + msg->method_len + 4 + msg->payload_len;

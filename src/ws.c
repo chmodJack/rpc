@@ -1,4 +1,5 @@
 #include "ws.h"
+#include "compat.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -94,13 +95,13 @@ void ws_buf_free(ws_buf_t *b) { free(b->data); memset(b, 0, sizeof(*b)); }
 static const char *WS_GUID = "258EAFA5-E914-47DA-95CA-5AB5B0D3E655";
 
 static char *find_header(const char *headers, const char *name) {
-    const char *p = strcasestr(headers, name);
+    const char *p = compat_strcasestr(headers, name);
     if (!p) return NULL;
     p += strlen(name);
     while (*p == ' ' || *p == ':') p++;
     const char *end = strstr(p, "\r\n");
     if (!end) return NULL;
-    int len = end - p;
+    int len = (int)(end - p);
     char *val = malloc(len + 1);
     memcpy(val, p, len);
     val[len] = '\0';
@@ -109,16 +110,16 @@ static char *find_header(const char *headers, const char *name) {
 
 int ws_server_handshake(const uint8_t *buf, int len, uint8_t **resp, int *resp_len) {
     /* Find end of HTTP headers */
-    const char *end = memmem(buf, len, "\r\n\r\n", 4);
+    const char *end = compat_memmem(buf, len, "\r\n\r\n", 4);
     if (!end) return 0;
-    int hdr_len = (end - (const char *)buf) + 4;
+    int hdr_len = (int)(end - (const char *)buf) + 4;
 
     char *key = find_header((const char *)buf, "Sec-WebSocket-Key");
     if (!key) return -1;
 
     /* Compute accept */
-    int klen = strlen(key);
-    int glen = strlen(WS_GUID);
+    int klen = (int)strlen(key);
+    int glen = (int)strlen(WS_GUID);
     char *concat = malloc(klen + glen + 1);
     memcpy(concat, key, klen);
     memcpy(concat + klen, WS_GUID, glen + 1);
@@ -148,7 +149,7 @@ int ws_client_handshake(const char *host, int port, const char *path,
                         uint8_t **req, int *req_len, char key_out[25]) {
     /* Generate random 16-byte key */
     uint8_t raw_key[16];
-    srand(time(NULL) ^ (long)req);
+    srand((unsigned)time(NULL) ^ (unsigned)(uintptr_t)req);
     for (int i = 0; i < 16; i++) raw_key[i] = rand() & 0xff;
     base64_encode(raw_key, 16, key_out);
 
@@ -169,13 +170,13 @@ int ws_client_handshake(const char *host, int port, const char *path,
 }
 
 int ws_client_validate(const uint8_t *buf, int len, const char key[25]) {
-    const char *end = memmem(buf, len, "\r\n\r\n", 4);
+    const char *end = compat_memmem(buf, len, "\r\n\r\n", 4);
     if (!end) return 0;
-    int hdr_len = (end - (const char *)buf) + 4;
+    int hdr_len = (int)(end - (const char *)buf) + 4;
 
     /* Verify accept header */
-    int klen = strlen(key);
-    int glen = strlen(WS_GUID);
+    int klen = (int)strlen(key);
+    int glen = (int)strlen(WS_GUID);
     char *concat = malloc(klen + glen + 1);
     memcpy(concat, key, klen);
     memcpy(concat + klen, WS_GUID, glen + 1);
@@ -266,6 +267,6 @@ int ws_frame_decode(const uint8_t *buf, int len, int *opcode,
         memcpy(*payload, buf + offset, plen);
     }
 
-    *consumed = offset + plen;
+    *consumed = offset + (int)plen;
     return (int)plen;
 }

@@ -46,7 +46,7 @@ int main(void) {
         return 1;
     }
 
-    printf("Server listening on ws://127.0.0.1:9000\n");
+    printf("Server listening on ws://0.0.0.0:9000\n");
     rpc_run(ctx);
 
     rpc_destroy(ctx);
