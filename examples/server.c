@@ -41,7 +41,7 @@ int main(void) {
     rpc_register(ctx, "add", handle_add);
     rpc_register(ctx, "hello", handle_hello);
 
-    if (rpc_listen(ctx, "127.0.0.1", 9000) < 0) {
+    if (rpc_listen(ctx, "0.0.0.0", 9000) < 0) {
         perror("rpc_listen");
         return 1;
     }

@@ -19,7 +19,7 @@ int main(void) {
     /* Client also registers a handler (bidirectional) */
     rpc_register(ctx, "ping", handle_ping);
 
-    rpc_peer_t *peer = rpc_connect(ctx, "ws://127.0.0.1:9000/");
+    rpc_peer_t *peer = rpc_connect(ctx, "ws://www.hongyunz.cc");
     if (!peer) {
         fprintf(stderr, "Failed to connect\n");
         return 1;
